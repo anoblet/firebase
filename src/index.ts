@@ -63,7 +63,7 @@ export const updateDocument = async (path: string, data: {}) => {
     .set(data, { merge: true });
 };
 
-const deleteDocument = async (path: string) => {
+export const deleteDocument = async (path: string) => {
   return firebase
     .firestore()
     .doc(path)
