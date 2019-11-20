@@ -10,7 +10,7 @@ export declare const addDocument: (path: string, data: {}) => Promise<any>;
 export declare const getDocument: (path: string, options?: {
     callback?: any;
 }) => Promise<any>;
-export declare const updateDocument: (path: string, data: {}) => Promise<void>;
+export declare const updateDocument: (path: string, data: {}) => Promise<boolean>;
 export declare const deleteDocument: (path: string) => Promise<void>;
 export declare const getCollection: (path: string, options?: {
     callback?: (data: {}) => {};
@@ -28,7 +28,7 @@ export declare class Firebase {
     getDocument: (path: string, options?: {
         callback?: any;
     }) => Promise<any>;
-    updateDocument: (path: string, data: {}) => Promise<void>;
+    updateDocument: (path: string, data: {}) => Promise<boolean>;
     deleteDocument: (path: string) => Promise<void>;
     getCollection: (path: string, options?: {
         callback?: (data: {}) => {};

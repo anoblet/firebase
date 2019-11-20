@@ -67,7 +67,9 @@ const updateDocument = async (path, data) => {
     return firebase
         .firestore()
         .doc(path)
-        .set(data, { merge: true });
+        .set(data, { merge: true })
+        .then((docRef) => true)
+        .catch(error => false);
 };
 const deleteDocument = async (path) => {
     return firebase

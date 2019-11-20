@@ -60,7 +60,9 @@ export const updateDocument = async (path: string, data: {}) => {
   return firebase
     .firestore()
     .doc(path)
-    .set(data, { merge: true });
+    .set(data, { merge: true })
+    .then((docRef: any) => true)
+    .catch(error => false);
 };
 
 export const deleteDocument = async (path: string) => {
