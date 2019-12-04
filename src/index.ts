@@ -1,21 +1,50 @@
-import firebase from "firebase/app";
+// import firebase from "firebase/app";
 import { config } from "./types";
 import { mapSnapshotToArray } from "./utility";
+
+export type Firebase_ = typeof import("firebase");
+
+declare global {
+  interface Window {
+    firebase: Firebase_;
+  }
+}
+
+const loadScript = (url: string): any =>
+  new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = url;
+    script.onerror = reject;
+    document.head.appendChild(script);
+    script.onload = () => {
+      resolve(window.firebase);
+    };
+  });
+
+const loadedModules = [];
+
+export const loadModule = (module: string) => {
+  if (loadedModules.includes(module)) return;
+  const result = loadScript(
+    `https://www.gstatic.com/firebasejs/7.5.0/firebase-${module}.js`
+  );
+  if (result) loadedModules.push(module);
+  return result;
+};
 
 /**
  * Initialize the firebase app
  * @param  config Configuration object
  * @return void
  */
-export const initialize = config => {
-  if (firebase.apps.length === 0) firebase.initializeApp(config);
-  else firebase.apps[0];
+export const initialize = async config => {
+  if (window.firebase.apps && window.firebase.apps.length === 0)
+    window.firebase.initializeApp(config);
   enablePersistance();
 };
 
 export const enablePersistance = async () => {
-  await import("firebase/firestore");
-  firebase
+  window.firebase
     .firestore()
     .enablePersistence()
     .catch(function(err) {
@@ -28,8 +57,8 @@ export const enablePersistance = async () => {
 };
 
 export const addDocument = async (path: string, data: {}) => {
-  await import("firebase/firestore");
-  return firebase
+  await loadModule("firestore");
+  return window.firebase
     .firestore()
     .collection(path)
     .add(data)
@@ -43,8 +72,8 @@ export const addDocument = async (path: string, data: {}) => {
 };
 
 export const getDocument = async (path: string, options?: { callback? }) => {
-  await import("firebase/firestore");
-  const document = firebase.firestore().doc(path);
+  await loadModule("firestore");
+  const document = window.firebase.firestore().doc(path);
   const data = document.get().then((doc: any) => doc.data());
   // If a callback was given, assume we want to watch for changes
   if (options && options.callback)
@@ -57,7 +86,8 @@ export const getDocument = async (path: string, options?: { callback? }) => {
 };
 
 export const updateDocument = async (path: string, data: {}) => {
-  return firebase
+  await loadModule("firestore");
+  return window.firebase
     .firestore()
     .doc(path)
     .set(data, { merge: true })
@@ -66,7 +96,7 @@ export const updateDocument = async (path: string, data: {}) => {
 };
 
 export const deleteDocument = async (path: string) => {
-  return firebase
+  return window.firebase
     .firestore()
     .doc(path)
     .delete();
@@ -84,9 +114,9 @@ export const getCollection = async (
     };
   }
 ) => {
-  // Import dependencies
-  await import("firebase/firestore");
-  let collection: any = firebase.firestore().collection(path);
+  await loadModule("app");
+  await loadModule("firestore");
+  let collection: any = window.firebase.firestore().collection(path);
   if (options && options.where) {
     collection = collection.where(
       options.where.property,
@@ -111,9 +141,8 @@ export const getCollection = async (
 };
 
 const getUser = async () => {
-  await import("firebase/auth");
   return new Promise((resolve: any) => {
-    firebase.auth().onAuthStateChanged((user: any) => {
+    window.firebase.auth().onAuthStateChanged((user: any) => {
       resolve(user);
     });
   });

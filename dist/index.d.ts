@@ -1,10 +1,17 @@
 import { config } from "./types";
+export declare type Firebase_ = typeof import("firebase");
+declare global {
+    interface Window {
+        firebase: Firebase_;
+    }
+}
+export declare const loadModule: (module: string) => any;
 /**
  * Initialize the firebase app
  * @param  config Configuration object
  * @return void
  */
-export declare const initialize: (config: any) => void;
+export declare const initialize: (config: any) => Promise<void>;
 export declare const enablePersistance: () => Promise<void>;
 export declare const addDocument: (path: string, data: {}) => Promise<any>;
 export declare const getDocument: (path: string, options?: {
@@ -23,7 +30,7 @@ export declare const getCollection: (path: string, options?: {
 }) => Promise<any>;
 export declare class Firebase {
     constructor(config: config);
-    init: (config: any) => void;
+    init: (config: any) => Promise<void>;
     addDocument: (path: string, data: {}) => Promise<any>;
     getDocument: (path: string, options?: {
         callback?: any;
