@@ -131,17 +131,3 @@ const getUser = async () => {
     });
   });
 };
-
-export class Firebase {
-  public constructor(config: config) {
-    this.init(config);
-  }
-
-  public init = initialize;
-  public addDocument = addDocument;
-  public getDocument = getDocument;
-  public updateDocument = updateDocument;
-  public deleteDocument = deleteDocument;
-  public getCollection = getCollection;
-  public getUser = getUser;
-}
