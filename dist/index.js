@@ -10,6 +10,16 @@ const mapSnapshotToArray = (snapshot) => {
     return result;
 };
 
+let appInitializedResolve;
+const appInitializedPromise = new Promise(resolve => {
+    appInitializedResolve = resolve;
+});
+const firestoreInitializedPromise = new Promise(async (resolve) => {
+    await appInitializedPromise;
+    await import('firebase/firestore');
+    await enablePersistance();
+    resolve();
+});
 /**
  * Initialize the firebase app
  * @param  config Configuration object
@@ -20,10 +30,10 @@ const initialize = async (config) => {
         firebase.initializeApp(config);
     else
         firebase.apps[0];
+    appInitializedResolve();
 };
-const enablePersistance = async () => {
-    await import('firebase/firestore');
-    await firebase
+const enablePersistance = () => {
+    return firebase
         .firestore()
         .enablePersistence()
         .catch(function (err) {
@@ -36,7 +46,7 @@ const enablePersistance = async () => {
     });
 };
 const addDocument = async (path, data) => {
-    await import('firebase/firestore');
+    await firestoreInitializedPromise;
     return firebase
         .firestore()
         .collection(path)
@@ -50,7 +60,7 @@ const addDocument = async (path, data) => {
     });
 };
 const getDocument = async (path, options) => {
-    await import('firebase/firestore');
+    await firestoreInitializedPromise;
     const document = firebase.firestore().doc(path);
     const data = document.get().then((doc) => doc.data());
     // If a callback was given, assume we want to watch for changes
@@ -63,6 +73,7 @@ const getDocument = async (path, options) => {
     return data;
 };
 const updateDocument = async (path, data) => {
+    await firestoreInitializedPromise;
     return firebase
         .firestore()
         .doc(path)
@@ -71,14 +82,14 @@ const updateDocument = async (path, data) => {
         .catch(error => false);
 };
 const deleteDocument = async (path) => {
+    await firestoreInitializedPromise;
     return firebase
         .firestore()
         .doc(path)
         .delete();
 };
 const getCollection = async (path, options) => {
-    // Import dependencies
-    await import('firebase/firestore');
+    await firestoreInitializedPromise;
     let collection = firebase.firestore().collection(path);
     if (options && options.where) {
         collection = collection.where(options.where.property, options.where.operator, options.where.value);

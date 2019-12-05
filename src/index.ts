@@ -2,6 +2,19 @@ import firebase from "firebase/app";
 import { config } from "./types";
 import { mapSnapshotToArray } from "./utility";
 
+let appInitializedResolve;
+
+const appInitializedPromise = new Promise(resolve => {
+  appInitializedResolve = resolve;
+});
+
+const firestoreInitializedPromise = new Promise(async resolve => {
+  await appInitializedPromise;
+  await import("firebase/firestore");
+  await enablePersistance();
+  resolve();
+});
+
 /**
  * Initialize the firebase app
  * @param  config Configuration object
@@ -10,11 +23,11 @@ import { mapSnapshotToArray } from "./utility";
 export const initialize = async config => {
   if (firebase.apps.length === 0) firebase.initializeApp(config);
   else firebase.apps[0];
+  appInitializedResolve();
 };
 
-export const enablePersistance = async () => {
-  await import("firebase/firestore");
-  await firebase
+export const enablePersistance = () => {
+  return firebase
     .firestore()
     .enablePersistence()
     .catch(function(err) {
@@ -27,7 +40,7 @@ export const enablePersistance = async () => {
 };
 
 export const addDocument = async (path: string, data: {}) => {
-  await import("firebase/firestore");
+  await firestoreInitializedPromise;
   return firebase
     .firestore()
     .collection(path)
@@ -42,7 +55,7 @@ export const addDocument = async (path: string, data: {}) => {
 };
 
 export const getDocument = async (path: string, options?: { callback? }) => {
-  await import("firebase/firestore");
+  await firestoreInitializedPromise;
   const document = firebase.firestore().doc(path);
   const data = document.get().then((doc: any) => doc.data());
   // If a callback was given, assume we want to watch for changes
@@ -56,6 +69,7 @@ export const getDocument = async (path: string, options?: { callback? }) => {
 };
 
 export const updateDocument = async (path: string, data: {}) => {
+  await firestoreInitializedPromise;
   return firebase
     .firestore()
     .doc(path)
@@ -65,6 +79,7 @@ export const updateDocument = async (path: string, data: {}) => {
 };
 
 export const deleteDocument = async (path: string) => {
+  await firestoreInitializedPromise;
   return firebase
     .firestore()
     .doc(path)
@@ -83,8 +98,7 @@ export const getCollection = async (
     };
   }
 ) => {
-  // Import dependencies
-  await import("firebase/firestore");
+  await firestoreInitializedPromise;
   let collection: any = firebase.firestore().collection(path);
   if (options && options.where) {
     collection = collection.where(
