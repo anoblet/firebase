@@ -7,15 +7,14 @@ import { mapSnapshotToArray } from "./utility";
  * @param  config Configuration object
  * @return void
  */
-export const initialize = config => {
+export const initialize = async config => {
   if (firebase.apps.length === 0) firebase.initializeApp(config);
   else firebase.apps[0];
-  enablePersistance();
 };
 
 export const enablePersistance = async () => {
   await import("firebase/firestore");
-  firebase
+  await firebase
     .firestore()
     .enablePersistence()
     .catch(function(err) {
