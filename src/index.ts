@@ -1,14 +1,14 @@
 import firebase from "firebase/app";
-import { config } from "./types";
 import { mapSnapshotToArray } from "./utility";
+export { Collection } from "./collection";
 
 let appInitializedResolve;
 
-const appInitializedPromise = new Promise(resolve => {
+const appInitializedPromise = new Promise((resolve) => {
   appInitializedResolve = resolve;
 });
 
-const firestoreInitializedPromise = new Promise(async resolve => {
+const firestoreInitializedPromise = new Promise(async (resolve) => {
   await appInitializedPromise;
   await import("firebase/firestore");
   await enablePersistance();
@@ -20,7 +20,7 @@ const firestoreInitializedPromise = new Promise(async resolve => {
  * @param  config Configuration object
  * @return void
  */
-export const initialize = async config => {
+export const initialize = async (config) => {
   if (firebase.apps.length === 0) firebase.initializeApp(config);
   else firebase.apps[0];
   appInitializedResolve();
@@ -30,7 +30,7 @@ export const enablePersistance = () => {
   return firebase
     .firestore()
     .enablePersistence()
-    .catch(function(err) {
+    .catch(function (err) {
       if (err.code == "failed-precondition") {
         console.log("failed-precondition");
       } else if (err.code == "unimplemented") {
@@ -49,7 +49,7 @@ export const addDocument = async (path: string, data: {}) => {
       // Should we return an id or the whole document with the id?
       return docRef.id;
     })
-    .catch(error => {
+    .catch((error) => {
       return new Error("Unable to add document");
     });
 };
@@ -75,15 +75,12 @@ export const updateDocument = async (path: string, data: {}) => {
     .doc(path)
     .set(data, { merge: true })
     .then((docRef: any) => true)
-    .catch(error => false);
+    .catch((error) => false);
 };
 
 export const deleteDocument = async (path: string) => {
   await firestoreInitializedPromise;
-  return firebase
-    .firestore()
-    .doc(path)
-    .delete();
+  return firebase.firestore().doc(path).delete();
 };
 
 export const getCollection = async (
