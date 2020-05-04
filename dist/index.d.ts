@@ -1,4 +1,3 @@
-import { config } from "./types";
 /**
  * Initialize the firebase app
  * @param  config Configuration object
@@ -21,23 +20,3 @@ export declare const getCollection: (path: string, options?: {
         value: string | boolean;
     };
 }) => Promise<any>;
-export declare class Firebase {
-    constructor(config: config);
-    init: (config: any) => Promise<void>;
-    addDocument: (path: string, data: {}) => Promise<any>;
-    getDocument: (path: string, options?: {
-        callback?: any;
-    }) => Promise<any>;
-    updateDocument: (path: string, data: {}) => Promise<boolean>;
-    deleteDocument: (path: string) => Promise<void>;
-    getCollection: (path: string, options?: {
-        callback?: (data: {}) => {};
-        orderBy?: string;
-        where?: {
-            property: string;
-            operator: any;
-            value: string | boolean;
-        };
-    }) => Promise<any>;
-    getUser: () => Promise<unknown>;
-}

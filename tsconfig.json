@@ -7,6 +7,6 @@
     "module": "esNext",
     "moduleResolution": "node",
     "lib": ["es2017", "dom"],
-    "declaration": true
+    "outDir": "dist"
   }
 }

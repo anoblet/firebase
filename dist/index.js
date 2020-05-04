@@ -1,22 +1,12 @@
-import firebase from 'firebase/app';
-
-const mapSnapshotToArray = (snapshot) => {
-    const result = [];
-    snapshot.forEach((doc) => {
-        const data = doc.data();
-        data.id = doc.id;
-        result.push(data);
-    });
-    return result;
-};
-
+import firebase from "firebase/app";
+import { mapSnapshotToArray } from "./utility";
 let appInitializedResolve;
 const appInitializedPromise = new Promise(resolve => {
     appInitializedResolve = resolve;
 });
 const firestoreInitializedPromise = new Promise(async (resolve) => {
     await appInitializedPromise;
-    await import('firebase/firestore');
+    await import("firebase/firestore");
     await enablePersistance();
     resolve();
 });
@@ -25,14 +15,14 @@ const firestoreInitializedPromise = new Promise(async (resolve) => {
  * @param  config Configuration object
  * @return void
  */
-const initialize = async (config) => {
+export const initialize = async (config) => {
     if (firebase.apps.length === 0)
         firebase.initializeApp(config);
     else
         firebase.apps[0];
     appInitializedResolve();
 };
-const enablePersistance = () => {
+export const enablePersistance = () => {
     return firebase
         .firestore()
         .enablePersistence()
@@ -45,7 +35,7 @@ const enablePersistance = () => {
         }
     });
 };
-const addDocument = async (path, data) => {
+export const addDocument = async (path, data) => {
     await firestoreInitializedPromise;
     return firebase
         .firestore()
@@ -59,7 +49,7 @@ const addDocument = async (path, data) => {
         return new Error("Unable to add document");
     });
 };
-const getDocument = async (path, options) => {
+export const getDocument = async (path, options) => {
     await firestoreInitializedPromise;
     const document = firebase.firestore().doc(path);
     const data = document.get().then((doc) => doc.data());
@@ -72,7 +62,7 @@ const getDocument = async (path, options) => {
         });
     return data;
 };
-const updateDocument = async (path, data) => {
+export const updateDocument = async (path, data) => {
     await firestoreInitializedPromise;
     return firebase
         .firestore()
@@ -81,14 +71,14 @@ const updateDocument = async (path, data) => {
         .then((docRef) => true)
         .catch(error => false);
 };
-const deleteDocument = async (path) => {
+export const deleteDocument = async (path) => {
     await firestoreInitializedPromise;
     return firebase
         .firestore()
         .doc(path)
         .delete();
 };
-const getCollection = async (path, options) => {
+export const getCollection = async (path, options) => {
     await firestoreInitializedPromise;
     let collection = firebase.firestore().collection(path);
     if (options && options.where) {
@@ -110,24 +100,10 @@ const getCollection = async (path, options) => {
     return data;
 };
 const getUser = async () => {
-    await import('firebase/auth');
+    await import("firebase/auth");
     return new Promise((resolve) => {
         firebase.auth().onAuthStateChanged((user) => {
             resolve(user);
         });
     });
 };
-class Firebase {
-    constructor(config) {
-        this.init = initialize;
-        this.addDocument = addDocument;
-        this.getDocument = getDocument;
-        this.updateDocument = updateDocument;
-        this.deleteDocument = deleteDocument;
-        this.getCollection = getCollection;
-        this.getUser = getUser;
-        this.init(config);
-    }
-}
-
-export { Firebase, addDocument, deleteDocument, enablePersistance, getCollection, getDocument, initialize, updateDocument };
