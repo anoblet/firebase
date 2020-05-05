@@ -1,21 +1,31 @@
 import { addDocument, getCollection } from "./index";
 export class Collection {
     constructor(uri) {
-        this.uri = uri;
         this.subscribers = [];
+        this.subscribers = [];
+        this.uri = uri;
+        this.getData();
     }
     async getData() {
-        this.data = await getCollection(this.uri, { callback: this.onUpdate });
+        getCollection(this.uri, {
+            callback: (data) => {
+                this.data = data;
+                this.onUpdate(data);
+                return {};
+            },
+        });
     }
     add(data) {
         addDocument(this.uri, data);
         return this;
     }
     onUpdate(data) {
-        this.subscribers.map((callback) => callback(data));
+        var _a;
+        (_a = this.subscribers) === null || _a === void 0 ? void 0 : _a.map((callback) => callback(data));
         return {};
     }
     subscribe(callback) {
+        callback(this.data);
         this.subscribers.push(callback);
     }
 }
