@@ -1,7 +1,8 @@
 import firebase from "firebase/app";
 import { mapSnapshotToArray } from "./utility";
+export { Collection } from "./collection";
 let appInitializedResolve;
-const appInitializedPromise = new Promise(resolve => {
+const appInitializedPromise = new Promise((resolve) => {
     appInitializedResolve = resolve;
 });
 const firestoreInitializedPromise = new Promise(async (resolve) => {
@@ -45,7 +46,7 @@ export const addDocument = async (path, data) => {
         // Should we return an id or the whole document with the id?
         return docRef.id;
     })
-        .catch(error => {
+        .catch((error) => {
         return new Error("Unable to add document");
     });
 };
@@ -69,14 +70,11 @@ export const updateDocument = async (path, data) => {
         .doc(path)
         .set(data, { merge: true })
         .then((docRef) => true)
-        .catch(error => false);
+        .catch((error) => false);
 };
 export const deleteDocument = async (path) => {
     await firestoreInitializedPromise;
-    return firebase
-        .firestore()
-        .doc(path)
-        .delete();
+    return firebase.firestore().doc(path).delete();
 };
 export const getCollection = async (path, options) => {
     await firestoreInitializedPromise;

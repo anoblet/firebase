@@ -1,3 +1,4 @@
+export { Collection } from "./collection";
 /**
  * Initialize the firebase app
  * @param  config Configuration object
