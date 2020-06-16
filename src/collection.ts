@@ -2,11 +2,12 @@ import { addDocument, getCollection } from "./index";
 
 export class Collection {
   data: any[];
+  orderBy: string;
   subscribers: any[] = [];
   uri: string;
 
-  constructor(uri: string) {
-    this.subscribers = [];
+  constructor({ orderBy, uri }: { orderBy?: string; uri: string }) {
+    this.orderBy = orderBy;
     this.uri = uri;
     this.getData();
   }
@@ -14,15 +15,18 @@ export class Collection {
   async getData() {
     getCollection(this.uri, {
       callback: (data: any) => {
+        console.log("hi", data);
         this.data = data;
         this.onUpdate(data);
         return {};
       },
+      orderBy: this.orderBy,
     });
   }
 
   add(data: any) {
-    addDocument(this.uri, data);
+    console.log(this.uri, data);
+    console.log(addDocument(this.uri, data));
     return this;
   }
 
@@ -32,7 +36,7 @@ export class Collection {
   }
 
   subscribe(callback) {
-    callback(this.data);
+    if (this.data) callback(this.data);
     this.subscribers.push(callback);
   }
 }

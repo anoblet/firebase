@@ -86,7 +86,7 @@ export const deleteDocument = async (path: string) => {
 export const getCollection = async (
   path: string,
   options?: {
-    callback?: (data: {}) => {};
+    callback?: (data: {}) => void;
     orderBy?: string;
     where?: {
       property: string;

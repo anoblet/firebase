@@ -13,7 +13,7 @@ export declare const getDocument: (path: string, options?: {
 export declare const updateDocument: (path: string, data: {}) => Promise<boolean>;
 export declare const deleteDocument: (path: string) => Promise<void>;
 export declare const getCollection: (path: string, options?: {
-    callback?: (data: {}) => {};
+    callback?: (data: {}) => void;
     orderBy?: string;
     where?: {
         property: string;
