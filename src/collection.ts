@@ -15,7 +15,6 @@ export class Collection {
   async getData() {
     getCollection(this.uri, {
       callback: (data: any) => {
-        console.log("hi", data);
         this.data = data;
         this.onUpdate(data);
         return {};
@@ -25,8 +24,7 @@ export class Collection {
   }
 
   add(data: any) {
-    console.log(this.uri, data);
-    console.log(addDocument(this.uri, data));
+    addDocument(this.uri, data);
     return this;
   }
 
